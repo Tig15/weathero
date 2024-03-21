@@ -15,13 +15,16 @@ import {fetchWeather} from '../api';
 import {COLORS} from '../theme/COLOR';
 import CitySelectorModal from './CitySelectorModal';
 import {cities, states} from '../config/appDataConfig';
+import CityInfo from './CityInfo';
+import CurrentWeather from './CurrentWeather';
 const windowWidth = Dimensions.get('window').width;
 
 const WeatherForecast = () => {
   const [forecast, setForecast] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedCity, setSelectedCity] = useState('Surat');
-  const days = 5;
+  const [selectedState, setSelectedState] = useState('Gujarat');
+  const days = 8;
 
   const handleFetchWeather = async city => {
     try {
@@ -41,6 +44,11 @@ const WeatherForecast = () => {
     setModalVisible(false);
     handleFetchWeather(city);
   };
+
+  const handleSelectState = state => {
+    setSelectedState(state);
+  };
+
   const renderForecastCard = ({item}) => {
     const today = new Date();
     const cardDate = new Date(item?.datetime);
@@ -74,7 +82,7 @@ const WeatherForecast = () => {
         <View style={styles.forecastFooter}>
           <View>
             <View style={styles.forecastTempBox}>
-              <Text style={styles.forecastTempText}>{item.tempmax}°C</Text>
+              <Text style={styles.forecastTempText}>{item.temp}°C</Text>
             </View>
             <View style={styles.forecastHumBox}>
               <Text style={styles.forecastHumText}>{item.humidity}%</Text>
@@ -96,9 +104,7 @@ const WeatherForecast = () => {
 
   return (
     <View>
-      <Text style={styles.forecastTitle}>
-        {days}-Day Weather Forecast - {selectedCity}
-      </Text>
+      <CityInfo city={selectedCity} state={selectedState} />
       <TouchableOpacity
         style={styles.selectCity}
         onPress={() => setModalVisible(true)}>
@@ -106,24 +112,28 @@ const WeatherForecast = () => {
           {selectedCity ? selectedCity : 'Select Your Place'}
         </Text>
       </TouchableOpacity>
-      {forecast && (
+
+      <CurrentWeather />
+
+      {/* {forecast && (
         <ScrollView
           style={styles.scrollFlat}
-          showsHorizontalScrollIndicator={false}
-          horizontal>
+          showsVerticalScrollIndicator={false}>
           <FlatList
             data={forecast.days.slice(0, days)}
             renderItem={renderForecastCard}
             keyExtractor={item => item.datetime}
-            horizontal={true}
+            numColumns={2}
           />
         </ScrollView>
-      )}
+      )} */}
       <CitySelectorModal
         visible={modalVisible}
         cities={cities}
         states={states}
         onSelect={handleCitySelect}
+        onStateSelect={handleSelectState}
+        selectedState={selectedState}
         onClose={() => setModalVisible(false)}
       />
     </View>
@@ -148,15 +158,16 @@ const styles = StyleSheet.create({
   },
   selectCity: {
     padding: 10,
-    backgroundColor: '#ccc',
+    backgroundColor: COLORS.secondary,
     alignItems: 'center',
     width: windowWidth * 0.9,
     alignSelf: 'center',
     borderRadius: 8,
+    marginTop: 10,
   },
   selectCityText: {
     fontSize: 16,
-    color: COLORS.dark_shade,
+    color: COLORS.primary,
     fontWeight: 'bold',
   },
   weatherCard: {
@@ -167,7 +178,7 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   forecastCard: {
-    width: (windowWidth * 0.75) / 2,
+    width: (windowWidth * 0.8) / 2,
     height: windowWidth / 2,
     padding: 10,
     backgroundColor: '#fff',
@@ -184,9 +195,9 @@ const styles = StyleSheet.create({
       },
     }),
     marginBottom: 8,
-    marginRight: 10,
     marginTop: 8,
-    marginLeft: 4,
+    marginLeft: 12,
+    alignSelf: 'center',
   },
   forecastDate: {
     fontSize: 18,
@@ -234,13 +245,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   windImage: {
-    width: 60,
+    width: 70,
     height: 25,
     marginTop: 3,
   },
   scrollFlat: {
     marginTop: 12,
-    marginLeft: 10,
-    width: windowWidth,
+    width: windowWidth * 0.9,
+    alignSelf: 'center',
+    marginBottom: (windowWidth * 0.6) / 2,
   },
+  selectCityHeaderText: {color: COLORS.windSpeedText, fontStyle: 'italic'},
 });

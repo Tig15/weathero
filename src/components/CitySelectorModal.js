@@ -6,27 +6,39 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
+  Dimensions,
 } from 'react-native';
+import {COLORS} from '../theme/COLOR';
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 
-const CitySelectorModal = ({visible, states, cities, onSelect, onClose}) => {
-  const [selectedState, setSelectedState] = useState(null);
-
-  const handleSelectState = state => {
-    setSelectedState(state);
-  };
-
-  const handleSelectCity = city => {
-    onSelect(city);
-  };
-
+const CitySelectorModal = ({
+  visible,
+  states,
+  onStateSelect,
+  cities,
+  onSelect,
+  onClose,
+  selectedState,
+}) => {
   const renderStates = ({item}) => (
-    <TouchableOpacity onPress={() => handleSelectState(item)}>
+    <TouchableOpacity onPress={() => onStateSelect(item.name)}>
       <Text style={styles.stateName}>{item.name}</Text>
+      {selectedState && (
+        <View style={styles.cityInfoContent}>
+          <FlatList
+            data={cities.filter(city => city.stateId === item.id)}
+            renderItem={renderCities}
+            keyExtractor={item => item.id.toString()}
+            showsVerticalScrollIndicator={false}
+          />
+        </View>
+      )}
     </TouchableOpacity>
   );
 
   const renderCities = ({item}) => (
-    <TouchableOpacity onPress={() => handleSelectCity(item)}>
+    <TouchableOpacity onPress={() => onSelect(item.name)}>
       <Text style={styles.cityName}>{item.name}</Text>
     </TouchableOpacity>
   );
@@ -38,31 +50,18 @@ const CitySelectorModal = ({visible, states, cities, onSelect, onClose}) => {
       visible={visible}
       onRequestClose={onClose}>
       <View style={styles.modalContent}>
-        <View style={styles.cityInfoContent}>
-          <Text style={styles.modalHeader}>Select Your State</Text>
+        <View style={styles.regionInfoContent}>
+          <Text style={styles.modalHeaderText}>Select Your State</Text>
           <FlatList
             data={states}
             renderItem={renderStates}
             keyExtractor={item => item.id.toString()}
             showsVerticalScrollIndicator={false}
           />
+          <TouchableOpacity onPress={onClose}>
+            <Text style={styles.closeText}>Close</Text>
+          </TouchableOpacity>
         </View>
-        {selectedState && (
-          <View style={styles.cityInfoContent}>
-            <Text style={styles.modalHeader}>
-              Cities in {selectedState.name}
-            </Text>
-            <FlatList
-              data={cities.filter(city => city.stateId === selectedState.id)}
-              renderItem={renderCities}
-              keyExtractor={item => item.id.toString()}
-              showsVerticalScrollIndicator={false}
-            />
-          </View>
-        )}
-        <TouchableOpacity onPress={onClose}>
-          <Text style={styles.closeText}>Close</Text>
-        </TouchableOpacity>
       </View>
     </Modal>
   );
@@ -77,29 +76,39 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
-  cityInfoContent: {
+  regionInfoContent: {
     backgroundColor: '#fff',
     padding: 20,
     borderRadius: 10,
     marginVertical: 10,
+    width: windowWidth * 0.9,
+    height: windowHeight * 0.8,
   },
-  modalHeader: {
+  modalHeaderText: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
+    color: COLORS.primary,
   },
   stateName: {
     fontSize: 16,
     marginBottom: 10,
     fontWeight: 'bold',
+    color: COLORS.dark_shade,
   },
   cityName: {
-    fontSize: 16,
+    fontSize: 14,
     marginBottom: 10,
+    color: COLORS.windSpeedText,
   },
   closeText: {
     fontSize: 16,
-    color: 'blue',
+    color: COLORS.temp,
     marginTop: 10,
+  },
+  cityInfoContent: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    paddingHorizontal: 9,
   },
 });
