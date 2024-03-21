@@ -24,20 +24,23 @@ const WeatherForecast = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedCity, setSelectedCity] = useState('Surat');
   const [selectedState, setSelectedState] = useState('Gujarat');
-  const days = 8;
+  const [currentWeather, setCurrentWeather] = useState(null);
+
+  useEffect(() => {
+    handleFetchWeather(selectedCity);
+  }, []);
 
   const handleFetchWeather = async city => {
     try {
       const data = await fetchWeather(city);
       setForecast(data);
+      if (data && data.days && data.days.length > 0) {
+        setCurrentWeather(data.days[0]);
+      }
     } catch (error) {
       console.error('Error fetching weather data:', error);
     }
   };
-
-  useEffect(() => {
-    handleFetchWeather(selectedCity);
-  }, []);
 
   const handleCitySelect = city => {
     setSelectedCity(city);
@@ -49,57 +52,58 @@ const WeatherForecast = () => {
     setSelectedState(state);
   };
 
-  const renderForecastCard = ({item}) => {
+  const renderCurrentWeatherCards = ({item}) => {
     const today = new Date();
     const cardDate = new Date(item?.datetime);
 
-    let dateString = cardDate.toDateString();
+    let dateString = cardDate.toLocaleDateString();
     if (cardDate.getDate() === today.getDate()) {
       dateString = 'Today';
     } else if (cardDate.getDate() === today.getDate() + 1) {
       dateString = 'Tomorrow';
     }
-    const weatherIcon =
-      item.conditions === 'Clear'
-        ? require('../theme/images/sun.png')
-        : item.conditions === 'Rain'
-        ? require('../theme/images/umbrella.png')
-        : item.conditions === 'Partially Cloud'
-        ? require('../theme/images/sunSlowRain.png')
-        : require('../theme/images/start.png');
+
+    const weatherIcon = getWeatherIcon(item.conditions);
 
     return (
-      <TouchableOpacity style={styles.forecastCard} onPress={() => {}}>
+      <TouchableOpacity
+        style={[
+          styles.forecastCard,
+          dateString === 'Today' ? {backgroundColor: COLORS.primary} : {},
+        ]}
+        onPress={() => {}}>
         <Text
-          style={styles.forecastDate}
-          adjustsFontSizeToFit={true}
-          numberOfLines={1}>
+          style={[
+            styles.forecastDate,
+            dateString === 'Today' ? {color: COLORS.light_shade} : {},
+          ]}>
           {dateString}
         </Text>
         <View style={{alignItems: 'center'}}>
           <Image source={weatherIcon} style={styles.forecastCondition} />
         </View>
-        <View style={styles.forecastFooter}>
-          <View>
-            <View style={styles.forecastTempBox}>
-              <Text style={styles.forecastTempText}>{item.temp}°C</Text>
-            </View>
-            <View style={styles.forecastHumBox}>
-              <Text style={styles.forecastHumText}>{item.humidity}%</Text>
-            </View>
-          </View>
-          <View style={styles.forecastWindSpeedBox}>
-            <Text style={styles.forecastWindSpeedText}>
-              {item.windspeed} km/h
-            </Text>
-            <Image
-              style={styles.windImage}
-              source={require('../theme/images/wind.png')}
-            />
-          </View>
-        </View>
+        <Text
+          style={[
+            styles.forecastTempText,
+            dateString === 'Today' ? {color: COLORS.light_shade} : {},
+          ]}>
+          {item.temp}°C
+        </Text>
       </TouchableOpacity>
     );
+  };
+
+  const getWeatherIcon = conditions => {
+    switch (conditions) {
+      case 'Clear':
+        return require('../theme/images/sun.png');
+      case 'Rain':
+        return require('../theme/images/umbrella.png');
+      case 'Partially Cloud':
+        return require('../theme/images/sunSlowRain.png');
+      default:
+        return require('../theme/images/start.png');
+    }
   };
 
   return (
@@ -113,20 +117,29 @@ const WeatherForecast = () => {
         </Text>
       </TouchableOpacity>
 
-      <CurrentWeather />
-
-      {/* {forecast && (
+      {forecast && (
         <ScrollView
           style={styles.scrollFlat}
-          showsVerticalScrollIndicator={false}>
+          horizontal
+          showsHorizontalScrollIndicator={false}>
           <FlatList
-            data={forecast.days.slice(0, days)}
-            renderItem={renderForecastCard}
+            data={forecast?.days}
+            renderItem={renderCurrentWeatherCards}
             keyExtractor={item => item.datetime}
-            numColumns={2}
+            horizontal
           />
         </ScrollView>
-      )} */}
+      )}
+
+      <View>
+        {currentWeather && (
+          <CurrentWeather
+            currentWeather={currentWeather}
+            getWeatherIcon={getWeatherIcon}
+          />
+        )}
+      </View>
+
       <CitySelectorModal
         visible={modalVisible}
         cities={cities}
@@ -139,8 +152,6 @@ const WeatherForecast = () => {
     </View>
   );
 };
-
-export default WeatherForecast;
 
 const styles = StyleSheet.create({
   forecastContainer: {
@@ -178,11 +189,11 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   forecastCard: {
-    width: (windowWidth * 0.8) / 2,
-    height: windowWidth / 2,
-    padding: 10,
+    width: (windowWidth * 0.5) / 2,
+    height: (windowWidth * 0.65) / 2,
+    padding: 15,
     backgroundColor: '#fff',
-    borderRadius: 10,
+    borderRadius: 40,
     ...Platform.select({
       ios: {
         shadowColor: 'rgba(0,0,0,0.8)',
@@ -200,60 +211,27 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   forecastDate: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: 'bold',
     textAlign: 'center',
     color: COLORS.primary,
   },
-  forecastCondition: {width: 80, height: 80},
-  forecastTempBox: {
-    backgroundColor: COLORS.temp,
-    borderRadius: 6,
-    padding: 4,
-  },
+  forecastCondition: {width: 50, height: 60},
+
   forecastTempText: {
-    color: COLORS.tempText,
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  forecastHumBox: {
-    backgroundColor: COLORS.humidity,
-    borderRadius: 6,
-    padding: 4,
-    marginTop: 6,
-  },
-  forecastHumText: {
-    color: COLORS.humidityText,
+    color: COLORS.temp,
     fontSize: 13,
     fontWeight: '700',
     textAlign: 'center',
-  },
-  forecastFooter: {
-    marginTop: 6,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  forecastWindSpeedBox: {
-    backgroundColor: COLORS.windSpeed,
-    borderRadius: 6,
-    padding: 4,
-  },
-  forecastWindSpeedText: {
-    color: COLORS.windSpeedText,
-    fontSize: 13,
-    fontWeight: '700',
-    textAlign: 'center',
-  },
-  windImage: {
-    width: 70,
-    height: 25,
-    marginTop: 3,
   },
   scrollFlat: {
     marginTop: 12,
-    width: windowWidth * 0.9,
+    width: windowWidth,
     alignSelf: 'center',
-    marginBottom: (windowWidth * 0.6) / 2,
+    marginBottom: (windowWidth * 0.2) / 2,
+    marginLeft: 14,
   },
   selectCityHeaderText: {color: COLORS.windSpeedText, fontStyle: 'italic'},
 });
+
+export default WeatherForecast;
