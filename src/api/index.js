@@ -1,4 +1,4 @@
-const API_KEY = 'ZVWKBDUUC4VZKJGFKU35W59HQ&';
+const API_KEY = 'MTNFWJ5ZQQYLYCCHJDKTSU49S';
 const API_URL =
   'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline';
 

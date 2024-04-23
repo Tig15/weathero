@@ -40,4 +40,31 @@ export const cities = [
   {id: 8, name: 'Kurnool', stateId: 1},
   {id: 9, name: 'Anantapur', stateId: 1},
   {id: 10, name: 'Warangal', stateId: 1},
+  {id: 11, name: 'Ahmedabad', stateId: 7},
+  {id: 12, name: 'Bhavnagar', stateId: 7},
+  {id: 13, name: 'Surat', stateId: 7},
+  {id: 14, name: 'Vadodara', stateId: 7},
+  {id: 15, name: 'Rajkot', stateId: 7},
+  {id: 16, name: 'Jamnagar', stateId: 7},
+  {id: 17, name: 'Gandhinagar', stateId: 7},
+  {id: 18, name: 'Anand', stateId: 7},
+  {id: 19, name: 'Junagadh', stateId: 7},
+  {id: 20, name: 'Nadiad', stateId: 7},
+  {id: 21, name: 'Bharuch', stateId: 7},
+  {id: 22, name: 'Porbandar', stateId: 7},
+  {id: 23, name: 'Valsad', stateId: 7},
+  {id: 24, name: 'Navsari', stateId: 7},
 ];
+
+
+
+
+
+
+
+
+
+
+
+
+

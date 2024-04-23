@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
   },
   cityInfoText: {
     fontSize: 20,
-    width: '60%',
+    width: '80%',
     color: COLORS.dark_shade,
   },
   cityInfoImage: {
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   todayDate: {
-    fontSize: 11,
+    fontSize: 12,
     color: COLORS.windSpeedText,
   },
 });

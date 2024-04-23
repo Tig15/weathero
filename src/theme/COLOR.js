@@ -10,4 +10,6 @@ export const COLORS = {
   tempText: '#EEEEEE',
   humidityText: '#FFEDD8',
   windSpeedText: '#211951',
+  newBg:"#322C2B",
+  skinText:"#E4C59E"
 };

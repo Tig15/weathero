@@ -25,10 +25,7 @@ const WeatherForecast = () => {
   const [selectedCity, setSelectedCity] = useState('Surat');
   const [selectedState, setSelectedState] = useState('Gujarat');
   const [currentWeather, setCurrentWeather] = useState(null);
-
-  useEffect(() => {
-    handleFetchWeather(selectedCity);
-  }, []);
+  const [selectedUnit, setSelectedUnit] = useState('°C')
 
   const handleFetchWeather = async city => {
     try {
@@ -41,6 +38,10 @@ const WeatherForecast = () => {
       console.error('Error fetching weather data:', error);
     }
   };
+
+  useEffect(() => {
+    handleFetchWeather(selectedCity);
+  }, []);
 
   const handleCitySelect = city => {
     setSelectedCity(city);
@@ -93,6 +94,10 @@ const WeatherForecast = () => {
     );
   };
 
+  const handleChangeUnit = () =>{
+    
+  }
+
   const getWeatherIcon = conditions => {
     switch (conditions) {
       case 'Clear':
@@ -109,13 +114,18 @@ const WeatherForecast = () => {
   return (
     <View>
       <CityInfo city={selectedCity} state={selectedState} />
-      <TouchableOpacity
-        style={styles.selectCity}
-        onPress={() => setModalVisible(true)}>
-        <Text style={styles.selectCityText}>
-          {selectedCity ? selectedCity : 'Select Your Place'}
-        </Text>
-      </TouchableOpacity>
+      <View style={styles.secondContainer}>
+        <TouchableOpacity
+          style={styles.selectCity}
+          onPress={() => setModalVisible(true)}>
+          <Text style={styles.selectCityText}>
+            {selectedCity ? selectedCity : 'Select Your Place'}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleChangeUnit()} style={styles.selectTempUnit}>
+          <Text style={styles.tempUnit}>C to F</Text>
+        </TouchableOpacity>
+      </View>
 
       {forecast && (
         <ScrollView
@@ -167,20 +177,34 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     color: COLORS.dark_shade,
   },
-  selectCity: {
-    padding: 10,
-    backgroundColor: COLORS.secondary,
-    alignItems: 'center',
+  secondContainer: {
+    marginTop: 20,
     width: windowWidth * 0.9,
     alignSelf: 'center',
-    borderRadius: 8,
-    marginTop: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
+  selectCity: {
+    backgroundColor: COLORS.secondary,
+    width: windowWidth * 0.35,
+    borderRadius: 8,
+    padding: 10,
+    alignItems: 'center',
+  },
+
   selectCityText: {
     fontSize: 16,
     color: COLORS.primary,
     fontWeight: 'bold',
   },
+  selectTempUnit: {
+    backgroundColor: COLORS.newBg,
+    width: windowWidth * 0.15,
+    borderRadius: 8,
+    padding: 10,
+    alignItems: 'center',
+  },
+  tempUnit: {fontSize: 14, color: COLORS.skinText, fontWeight: 'bold'},
   weatherCard: {
     margin: 10,
     padding: 10,
